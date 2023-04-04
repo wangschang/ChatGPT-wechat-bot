@@ -21,12 +21,32 @@ async function onMessage(msg) {
   if (msg.self()) {
     return;
   }
-
+  
   if (room && isText) {
     const topic = await room.topic();
-    console.log(
-      `Group name: ${topic} talker: ${await contact.name()} content: ${content}`
-    );
+    //判断是否在白名单中
+    if(config.groupNames !=""){
+       let groupnames = config.groupNames.toString().split(",")
+        let group_allow = false
+        for(var i =0;i<groupnames.length;i++){
+            if(groupnames[i] == topic){
+              group_allow = true
+            }
+        }
+        if(!group_allow){
+           console.log(
+            `Group name: ${topic} is not in whitelist`
+          ); 
+          return;
+        }
+        console.log(
+          `Group name: ${topic} talker: ${await contact.name()} content: ${content}`
+        ); 
+    }
+    //判断用户是否达到发送的上限
+    if(config.userLimit > 0){
+      
+    }
 
     const pattern = RegExp(`^@${receiver.name()}\\s+${config.groupKey}[\\s]*`);
     if (await msg.mentionSelf()) {
