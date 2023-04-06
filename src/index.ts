@@ -46,7 +46,10 @@ async function onMessage(msg) {
           `Group name: ${topic} talker: ${await contact.name()} content: ${content}`
         ); 
     }
-    //判断用户是否达到发送的上限2023
+
+    const pattern = RegExp(`^@${receiver.name()}\\s+${config.groupKey}[\\s]*`);
+    if (await msg.mentionSelf()) {
+      //判断用户是否达到发送的上限2023
     if(config.userLimit > 0){
       const now = new Date();
       //now.getFullYear() now.getMonth() now.getDate()
@@ -66,9 +69,6 @@ async function onMessage(msg) {
         }
       }
     }
-
-    const pattern = RegExp(`^@${receiver.name()}\\s+${config.groupKey}[\\s]*`);
-    if (await msg.mentionSelf()) {
       if (pattern.test(content)) {
         const groupContent = content.replace(pattern, "");
         chatGPTClient.replyMessage(room, groupContent);
