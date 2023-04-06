@@ -16,6 +16,6 @@ export default {
   privateReplyMode: false,
   // 只有在下面的群列表里面才可以唤醒机器人 如果为空默认为所有的群
   groupNames:"群名称1,群名称2",
-  //用户提问的限制 0 为不限制次数 
+  //用户当天得到呼应的次数 0 为不限制次数  
   userLimit:0
 };

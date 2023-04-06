@@ -2,6 +2,9 @@ import { WechatyBuilder } from "wechaty";
 import qrcodeTerminal from "qrcode-terminal";
 import config from "./config.js";
 import ChatGPT from "./chatgpt.js";
+//引入cache
+import NodeCache from "node-cache";
+const myCache = new NodeCache({ stdTTL:86400});
 
 let bot: any = {};
 const startTime = new Date();
@@ -24,7 +27,7 @@ async function onMessage(msg) {
   
   if (room && isText) {
     const topic = await room.topic();
-    //判断是否在白名单中
+    //判断是否在白名单中2023
     if(config.groupNames !=""){
        let groupnames = config.groupNames.toString().split(",")
         let group_allow = false
@@ -43,9 +46,25 @@ async function onMessage(msg) {
           `Group name: ${topic} talker: ${await contact.name()} content: ${content}`
         ); 
     }
-    //判断用户是否达到发送的上限
+    //判断用户是否达到发送的上限2023
     if(config.userLimit > 0){
-      
+      const now = new Date();
+      //now.getFullYear() now.getMonth() now.getDate()
+      let cacheKey = now.getFullYear() + ":" + now.getMonth() + ":"+ now.getDate()+ ":" +contact.name();
+      let val = Number(myCache.get(cacheKey));
+      console.log(`userlimitkey:${cacheKey},val:${val}`);
+      if(val == undefined  || val == 0 || isNaN(val) ){
+        myCache.set(cacheKey,1);
+      }else{
+        if(val >= config.userLimit){
+          console.log(
+            `Group name: ${topic} talker: ${await contact.name()} content: ${content} reach max limit today`
+          ); 
+          return;
+        }else{
+          myCache.set(cacheKey,val + 1)
+        }
+      }
     }
 
     const pattern = RegExp(`^@${receiver.name()}\\s+${config.groupKey}[\\s]*`);
